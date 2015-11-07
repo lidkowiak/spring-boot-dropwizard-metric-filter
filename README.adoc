@@ -2,7 +2,7 @@
 
 *DropwizardMetricsFilter* is alternative to default Spring Boot
 https://github.com/spring-projects/spring-boot/blob/master/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/autoconfigure/MetricsFilter.java[MetricsFilter].
-It uses http://metrics.dropwizard.io/3.1.0/[Dropwizard Metrics] to provide https://dropwizard.github.io/metrics/3.1.0/manual/core/#timers[timer metrics] instead of simple gauge.
+It uses http://metrics.dropwizard.io/3.1.0/[Dropwizard Metrics] to provide https://dropwizard.github.io/metrics/3.1.0/manual/core/#timers[timer metrics] instead of simple gauges.
 
 == Usage
 * Disable default https://github.com/spring-projects/spring-boot/blob/master/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/autoconfigure/MetricsFilter.java[MetricsFilter]. in Boot 1.3.0.RC1.
@@ -11,7 +11,7 @@ It uses http://metrics.dropwizard.io/3.1.0/[Dropwizard Metrics] to provide https
 ----
 See also: https://github.com/spring-projects/spring-boot/issues/2599 and https://github.com/spring-projects/spring-boot/issues/4365
 
-* register `DropwizardMetricsFilter` filter
+* Register `DropwizardMetricsFilter` filter
 ----
     @Bean
     DropwizardMetricsFilter metricFilter(MetricRegistry metricRegistry) {
@@ -22,7 +22,8 @@ See also: https://github.com/spring-projects/spring-boot/issues/2599 and https:/
 == Demo
 * Run `pl.lidkowiak.demo.DemoApplication`
 * Run `ab -n 500 -c 5 http://localhost:8080/hello/DropwizardMetricsFilter?avgDuration=100\&stdDev=20`
-
+It request 500 times (with 5 concurrent users) /hello/{name} endpoint which waits inside average 100ms
+with standard deviation of 20 ms.
 ----
 This is ApacheBench, Version 2.3 <$Revision: 1528965 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
@@ -74,7 +75,7 @@ Percentage of the requests served within a certain time (ms)
  100%    405 (longest request)
 ----
 
-* Slf4j Reporter output
+* Slf4jReporter output
 
 ----
 2015-11-07 18:27:40.454  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=6, min=120.0, max=254.0, mean=185.0, stddev=38.71692136521188, median=185.0, p75=185.0, p95=254.0, p98=254.0, p99=254.0, p999=254.0, mean_rate=40.04454261260247, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
