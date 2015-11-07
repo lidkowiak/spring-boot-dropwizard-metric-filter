@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>pl.lidkowiak</groupId>
-    <artifactId>spring-boot-tomcat-jmx</artifactId>
+    <artifactId>spring-boot-dropwizard-metric-filter</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
     <name>spring-boot-dropwizard-metric-filter</name>
