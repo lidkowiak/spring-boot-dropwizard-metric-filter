@@ -1,0 +1,95 @@
+= DropwizardMetricsFilter
+
+*DropwizardMetricsFilter* is alternative to default Spring Boot
+https://github.com/spring-projects/spring-boot/blob/master/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/autoconfigure/MetricsFilter.java[MetricsFilter].
+It uses http://metrics.dropwizard.io/3.1.0/[Dropwizard Metrics] to provide https://dropwizard.github.io/metrics/3.1.0/manual/core/#timers[timer metrics] instead of simple gauge.
+
+== Usage
+* Disable default https://github.com/spring-projects/spring-boot/blob/master/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/autoconfigure/MetricsFilter.java[MetricsFilter]. in Boot 1.3.0.RC1.
+----
+@SpringBootApplication(exclude = MetricFilterAutoConfiguration.class)`
+----
+See also: https://github.com/spring-projects/spring-boot/issues/2599 and https://github.com/spring-projects/spring-boot/issues/4365
+
+* register `DropwizardMetricsFilter` filter
+----
+    @Bean
+    DropwizardMetricsFilter metricFilter(MetricRegistry metricRegistry) {
+        return new DropwizardMetricsFilter(metricRegistry);
+    }
+----
+
+== Demo
+* Run `pl.lidkowiak.demo.DemoApplication`
+* Run `ab -n 500 -c 5 http://localhost:8080/hello/DropwizardMetricsFilter?avgDuration=100\&stdDev=20`
+
+----
+This is ApacheBench, Version 2.3 <$Revision: 1528965 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Finished 500 requests
+
+
+Server Software:        Apache-Coyote/1.1
+Server Hostname:        localhost
+Server Port:            8080
+
+Document Path:          /hello/DropwizardMetricsFilter?avgDuration=100&stdDev=20
+Document Length:        30 bytes
+
+Concurrency Level:      5
+Time taken for tests:   10.820 seconds
+Complete requests:      500
+Failed requests:        0
+Total transferred:      114000 bytes
+HTML transferred:       15000 bytes
+Requests per second:    46.21 [#/sec] (mean)
+Time per request:       108.202 [ms] (mean)
+Time per request:       21.640 [ms] (mean, across all concurrent requests)
+Transfer rate:          10.29 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:    53  108  33.4    105     405
+Waiting:       52  107  30.3    104     358
+Total:         53  108  33.4    105     405
+
+Percentage of the requests served within a certain time (ms)
+  50%    105
+  66%    114
+  75%    119
+  80%    122
+  90%    132
+  95%    140
+  98%    153
+  99%    353
+ 100%    405 (longest request)
+----
+
+* Slf4j Reporter output
+
+----
+2015-11-07 18:27:40.454  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=6, min=120.0, max=254.0, mean=185.0, stddev=38.71692136521188, median=185.0, p75=185.0, p95=254.0, p98=254.0, p99=254.0, p999=254.0, mean_rate=40.04454261260247, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+2015-11-07 18:27:41.453  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=55, min=65.0, max=254.0, mean=110.5231035972005, stddev=33.16854950152085, median=103.0, p75=120.0, p95=185.0, p98=185.0, p99=254.0, p999=254.0, mean_rate=47.842189472644925, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+2015-11-07 18:27:42.453  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=102, min=52.0, max=254.0, mean=107.7647351793352, stddev=28.38485723748732, median=104.0, p75=120.0, p95=151.0, p98=185.0, p99=185.0, p999=254.0, mean_rate=47.45224056549215, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+2015-11-07 18:27:43.454  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=148, min=52.0, max=254.0, mean=106.76521345549817, stddev=25.66119273816889, median=104.0, p75=117.0, p95=148.0, p98=183.0, p99=185.0, p999=254.0, mean_rate=46.98274099326768, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+2015-11-07 18:27:44.453  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=197, min=52.0, max=254.0, mean=105.3189303554298, stddev=24.430361761666052, median=103.0, p75=118.0, p95=144.0, p98=183.0, p99=185.0, p999=254.0, mean_rate=47.47451892253533, m1=0.0, m5=0.0, m15=0.0, rate_unit=events/second, duration_unit=milliseconds
+2015-11-07 18:27:45.453  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=244, min=52.0, max=254.0, mean=105.31854849038385, stddev=23.32048325516222, median=103.0, p75=118.0, p95=140.0, p98=156.0, p99=185.0, p999=254.0, mean_rate=47.38244152934476, m1=47.8, m5=47.8, m15=47.8, rate_unit=events/second, duration_unit=milliseconds
+2015-11-07 18:27:46.453  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=292, min=52.0, max=254.0, mean=105.07475456375582, stddev=22.983412369883673, median=103.0, p75=118.0, p95=140.0, p98=151.0, p99=183.0, p999=254.0, mean_rate=47.48312383188812, m1=47.8, m5=47.8, m15=47.8, rate_unit=events/second, duration_unit=milliseconds
+2015-11-07 18:27:47.453  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=339, min=52.0, max=254.0, mean=105.0522321281957, stddev=22.80827883297693, median=104.0, p75=118.0, p95=139.0, p98=148.0, p99=183.0, p999=254.0, mean_rate=47.415040779532404, m1=47.8, m5=47.8, m15=47.8, rate_unit=events/second, duration_unit=milliseconds
+2015-11-07 18:27:48.453  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=386, min=52.0, max=254.0, mean=104.98961842318033, stddev=22.548012100332343, median=104.0, p75=118.0, p95=138.0, p98=146.0, p99=183.0, p999=254.0, mean_rate=47.36428902667273, m1=47.8, m5=47.8, m15=47.8, rate_unit=events/second, duration_unit=milliseconds
+2015-11-07 18:27:49.454  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=437, min=52.0, max=254.0, mean=104.23222189407763, stddev=22.05118064279189, median=103.0, p75=117.0, p95=138.0, p98=146.0, p99=183.0, p999=254.0, mean_rate=47.75754753043771, m1=47.8, m5=47.8, m15=47.8, rate_unit=events/second, duration_unit=milliseconds
+2015-11-07 18:27:50.453  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=483, min=52.0, max=254.0, mean=104.42380347467433, stddev=21.922950600515044, median=104.0, p75=117.0, p95=138.0, p98=146.0, p99=156.0, p999=254.0, mean_rate=47.58737922453206, m1=47.768017765851724, m5=47.793388581528646, m15=47.79778393920196, rate_unit=events/second, duration_unit=milliseconds
+2015-11-07 18:27:51.454  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=500, min=52.0, max=254.0, mean=104.24476590021655, stddev=21.804165007908967, median=104.0, p75=117.0, p95=138.0, p98=146.0, p99=156.0, p999=254.0, mean_rate=44.84230507378544, m1=47.768017765851724, m5=47.793388581528646, m15=47.79778393920196, rate_unit=events/second, duration_unit=milliseconds
+2015-11-07 18:27:52.454  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=500, min=52.0, max=254.0, mean=104.24476590021655, stddev=21.804165007908967, median=104.0, p75=117.0, p95=138.0, p98=146.0, p99=156.0, p999=254.0, mean_rate=41.15056098085813, m1=47.768017765851724, m5=47.793388581528646, m15=47.79778393920196, rate_unit=events/second, duration_unit=milliseconds
+2015-11-07 18:27:53.454  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=500, min=52.0, max=254.0, mean=104.24476590021655, stddev=21.804165007908967, median=104.0, p75=117.0, p95=138.0, p98=146.0, p99=156.0, p999=254.0, mean_rate=38.02232335637893, m1=47.768017765851724, m5=47.793388581528646, m15=47.79778393920196, rate_unit=events/second, duration_unit=milliseconds
+2015-11-07 18:27:54.454  INFO 18620 --- [rter-1-thread-1] metrics                                  : type=TIMER, name=timer.GET.200.hello.name, count=500, min=52.0, max=254.0, mean=104.24476590021655, stddev=21.804165007908967, median=104.0, p75=117.0, p95=138.0, p98=146.0, p99=156.0, p999=254.0, mean_rate=35.33387344169335, m1=47.768017765851724, m5=47.793388581528646, m15=47.79778393920196, rate_unit=events/second, duration_unit=milliseconds
+----
