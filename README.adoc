@@ -5,13 +5,13 @@ https://github.com/spring-projects/spring-boot/blob/master/spring-boot-actuator/
 It uses http://metrics.dropwizard.io/3.1.0/[Dropwizard Metrics] to provide https://dropwizard.github.io/metrics/3.1.0/manual/core/#timers[timer metrics] instead of simple gauges.
 
 == Usage
-* Disable default https://github.com/spring-projects/spring-boot/blob/master/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/autoconfigure/MetricsFilter.java[MetricsFilter]. in Boot 1.3.0.RC1.
+* Disable default https://github.com/spring-projects/spring-boot/blob/master/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/autoconfigure/MetricsFilter.java[MetricsFilter] in Spring Boot 1.3.0.RC1.
 ----
 @SpringBootApplication(exclude = MetricFilterAutoConfiguration.class)`
 ----
 See also: https://github.com/spring-projects/spring-boot/issues/2599 and https://github.com/spring-projects/spring-boot/issues/4365
 
-* Register `DropwizardMetricsFilter` filter
+* Register `DropwizardMetricsFilter` filter on `/*` path
 ----
     @Bean
     DropwizardMetricsFilter metricFilter(MetricRegistry metricRegistry) {
@@ -21,9 +21,12 @@ See also: https://github.com/spring-projects/spring-boot/issues/2599 and https:/
 
 == Demo
 * Run `pl.lidkowiak.demo.DemoApplication`
+
 * Run `ab -n 500 -c 5 http://localhost:8080/hello/DropwizardMetricsFilter?avgDuration=100\&stdDev=20`
-It request 500 times (with 5 concurrent users) /hello/{name} endpoint which waits inside average 100ms
+
+It requests 500 times (with 5 concurrent users) `/hello/{name}` endpoint which internally waits 100ms on average
 with standard deviation of 20 ms.
+
 ----
 This is ApacheBench, Version 2.3 <$Revision: 1528965 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
