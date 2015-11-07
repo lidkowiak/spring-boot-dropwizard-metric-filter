@@ -4,6 +4,11 @@
 https://github.com/spring-projects/spring-boot/blob/master/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/autoconfigure/MetricsFilter.java[MetricsFilter].
 It uses http://metrics.dropwizard.io/3.1.0/[Dropwizard Metrics] to provide https://dropwizard.github.io/metrics/3.1.0/manual/core/#timers[timer metrics] instead of simple gauges.
 
+== Build
+----
+./mvnw clean install
+----
+
 == Usage
 * Disable default https://github.com/spring-projects/spring-boot/blob/master/spring-boot-actuator/src/main/java/org/springframework/boot/actuate/autoconfigure/MetricsFilter.java[MetricsFilter] in Spring Boot 1.3.0.RC1.
 ----
